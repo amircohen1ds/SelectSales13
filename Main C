@@ -1,0 +1,41 @@
+SELECT  product,
+        product_price,
+        items_sold,
+        product_price * items_sold AS revenue,
+        RANK() OVER (ORDER BY product_price * items_sold DESC) AS revenue_rank
+FROM sales;
+
+SELECT  month,
+        revenue,
+        revenue - LAG(revenue, 1) OVER (ORDER BY month) AS monthly_delta
+FROM revenue;
+
+
+SELECT  month,
+        client,
+        cash_flow,
+        SUM (cash_flow) OVER (PARTITION BY client ORDER BY month) AS running_total
+ 
+FROM budget;
+
+
+SELECT  client,
+        date_due,
+        amount_due,
+        DATEDIFF ('2020-04-30', date_due) AS days_due,
+        CASE
+    WHEN  DATEDIFF ('2020-04-30', date_due) <= 30 THEN '0-30 days'
+    WHEN  DATEDIFF ('2020-04-30', date_due) > 30 AND DATEDIFF ('2020-04-30', date_due) <=90 THEN '31-90 days'
+    WHEN  DATEDIFF ('2020-04-30', date_due) > 90 AND DATEDIFF ('2020-04-30', date_due) <=180 THEN '91-180 days'
+    WHEN  DATEDIFF ('2020-04-30', date_due) > 180 AND DATEDIFF ('2020-04-30', date_due) <=365 THEN '181-365 days'
+    ELSE '> 365 days'
+END AS time_bucket
+ 
+FROM debt;
+
+SELECT  warehouse,
+        brand,
+        SUM (quantity) AS sum_product
+ 
+FROM warehouse
+GROUP BY ROLLUP (warehouse, brand);
